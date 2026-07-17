@@ -3,6 +3,7 @@ package com.example.library.service;
 import com.example.library.model.Book;
 import com.example.library.model.BorrowRecord;
 import com.example.library.model.Member;
+import com.example.library.model.Reservation;
 import com.example.library.repository.BookRepository;
 import com.example.library.repository.BorrowRecordRepository;
 import com.example.library.repository.MemberRepository;
@@ -15,6 +16,9 @@ import java.util.List;
 
 @Service
 public class BorrowService {
+	
+	@Autowired
+	private ReservationService reservationService;
 
     @Autowired
     private BorrowRecordRepository borrowRecordRepository;
@@ -63,8 +67,23 @@ public class BorrowService {
         Book book = record.getBook();
         book.setAvailableCopies(book.getAvailableCopies() + 1);
         bookRepository.save(book);
+        borrowRecordRepository.save(record);
 
-        return borrowRecordRepository.save(record);
+        // Fair queue check: if someone's been waiting for this book, hand it straight
+        // to them instead of leaving it as free-for-all first-come-first-served.
+        Reservation next = reservationService.fulfillNextInQueue(book.getId());
+        if (next != null) {
+            book.setAvailableCopies(book.getAvailableCopies() - 1);
+            bookRepository.save(book);
+
+            LocalDate dueDate = today.plusDays(LOAN_PERIOD_DAYS);
+            BorrowRecord newRecord = new BorrowRecord(book, next.getMember(), today, dueDate);
+            borrowRecordRepository.save(newRecord);
+
+            reservationService.markFulfilled(next);
+        }
+
+        return record;
     }
 
     public List<BorrowRecord> getHistoryForMember(Long memberId) {

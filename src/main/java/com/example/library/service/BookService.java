@@ -33,6 +33,7 @@ public class BookService {
         book.setAuthor(updatedBook.getAuthor());
         book.setIsbn(updatedBook.getIsbn());
         book.setGenre(updatedBook.getGenre());
+        book.setCoverImageUrl(updatedBook.getCoverImageUrl());
         book.setTotalCopies(updatedBook.getTotalCopies());
         book.setAvailableCopies(updatedBook.getAvailableCopies());
         return bookRepository.save(book);

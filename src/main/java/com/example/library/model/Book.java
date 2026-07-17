@@ -14,6 +14,7 @@ public class Book {
     private String author;
     private String isbn;
     private String genre;
+    private String coverImageUrl;
     private int totalCopies;
     private int availableCopies;
 
@@ -43,6 +44,9 @@ public class Book {
 
     public String getGenre() { return genre; }
     public void setGenre(String genre) { this.genre = genre; }
+    
+    public String getCoverImageUrl() { return coverImageUrl; }
+    public void setCoverImageUrl(String coverImageUrl) { this.coverImageUrl = coverImageUrl; }
 
     public int getTotalCopies() { return totalCopies; }
     public void setTotalCopies(int totalCopies) { this.totalCopies = totalCopies; }
